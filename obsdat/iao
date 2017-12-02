@@ -1,0 +1,7 @@
+#Submitted by S.Giridhar 6/28/03
+observatory = "iao"
+	name = "Indian Astronomical Observatory, Hanle"
+	longitude = 281.03583
+	latitude = 32.7794
+	altitude = 4500
+	timezone = -5.5

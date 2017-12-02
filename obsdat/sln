@@ -1,0 +1,7 @@
+#Submited by Giovanni Catanzaro, 7/17/03.
+observatory = "sln"
+	name = "SLN-Catania Astrophysical Observatory"
+	longitude = 345:01:36
+	latitude = 37:41.5
+	altitude = 1725.
+	timezone = -1

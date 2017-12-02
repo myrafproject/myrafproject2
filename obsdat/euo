@@ -1,0 +1,7 @@
+#Submited by Ahmet Devlen,4/21/04
+observatory = "euo"
+	name = "Ege University Observatory"
+	longitude = -27:16.5
+	latitude = 38:23.9
+	altitude = 795.
+	timezone = 2

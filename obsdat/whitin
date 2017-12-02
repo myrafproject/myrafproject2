@@ -1,0 +1,7 @@
+#Submitted by KimK.McLeod 10/13/1999
+observatory = "whitin"
+	name = "Whitin Observatory, Wellesley College"
+	longitude = 71.305833
+	latitude = 42.295
+	altitude = 32
+	timezone = 5

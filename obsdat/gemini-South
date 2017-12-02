@@ -1,0 +1,7 @@
+#Gemini-South, The coordinates are from GPS measurement sand the elevation, is from the Gemini Web pages http://www.gemini.edu/public, Correctedcoordsfrom Bryan Miller, 5/18/2006
+observatory = "gemini-south"
+	name = "GeminiSouthObservatory"
+	longitude = 70:44.2016
+	latitude = -30:14.445
+	altitude = 2722.
+	timezone = 4

@@ -1,0 +1,6 @@
+observatory = "kpno"
+	name = "Kitt Peak National Observatory"
+	longitude = 111:36.0
+	latitude = 31:57.8
+	altitude = 2120.
+	timezone = 7

@@ -1,0 +1,7 @@
+#The following additional entries were suppied by Peter Weilbacher, weilbach@uni-sw.gwdg.de on 28 Jan 2002 13:12:59-0700.
+observatory = "esontt"
+	name = European Southern Observatory, NTT, LaSilla
+	longitude = 70:43:54.272
+	latitude = -29:15:18.440
+	altitude = 2375
+	timezone = 4

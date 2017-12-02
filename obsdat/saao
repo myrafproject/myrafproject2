@@ -1,0 +1,7 @@
+#Submitted by John Memzies 12/31/99
+observatory = "saao"
+	name = "South African Astronomical Observatory"
+	longitude = 339:11:21.5
+	latitude = -32:22:46
+	altitude = 1798
+	timezone = -2

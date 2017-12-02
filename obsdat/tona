@@ -1,0 +1,6 @@
+#Submitted by Patrick Vielle 5/4/93
+observatory = "tona"
+	name = "Observatorio Astronomico Nacional, Tonantzintla"
+	longitude = 98:18:50
+	latitude = 19:01:58
+	timezone = 8

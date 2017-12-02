@@ -1,0 +1,7 @@
+## Submitted by FFO 22 Feb 2017
+observatory = "Adyu60"
+	name = "Adıyaman University Observatory, Turkey"
+	longitude = 37:45:3.6
+	latitude = 38:13:30
+	altitude = 690.
+	timezone = 2

@@ -1,0 +1,7 @@
+#Submitted by Pat Seitzer 10/31/93
+observatory = "mdm"
+	name = "Michigan-Dartmouth-MITObservatory"
+	longitude = 111:37.0
+	latitude = 31:57.0
+	altitude = 1938.5
+	timezone = 7

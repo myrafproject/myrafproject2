@@ -1,0 +1,7 @@
+#Submitted by Alan Koski 1/13/93
+observatory = "mtbigelow"
+	name = "Catalina Observatory:61inchtelescope"
+	longitude = 110:43.9
+	latitude = 32:25.0
+	altitude = 2510.
+	timezone = 7

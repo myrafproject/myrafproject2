@@ -1,0 +1,7 @@
+#Submitted by Bill Vacca 7/14/99
+observatory = "irtf"
+	name = "NASA Infrared Telescope Facility"
+	longitude = 155.471999
+	latitude = 19.826218
+	altitude = 4168
+	timezone = 10

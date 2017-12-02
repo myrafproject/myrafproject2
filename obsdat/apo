@@ -1,0 +1,7 @@
+#Submitted by Michael Ledlow 8/8/96
+observatory = "apo"
+	name = "Apache Point Observatory"
+	longitude = 105:49.2
+	latitude = 32:46.8
+	altitude = 2798.
+	timezone = 7

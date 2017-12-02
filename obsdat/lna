@@ -1,0 +1,7 @@
+#Submitted by Claudia Vilega Rodriques 12/12/97
+observatory = "lna"
+	name = "Laboratorio Nacionalde Astrofisica-Brazil"
+	longitude = 45.5825
+	latitude = -22:32:04
+	altitude = 1864
+	timezone = 3

@@ -1,0 +1,7 @@
+#
+observatory = "esovlt"
+	name = European Southern Observatory, VLT, Paranal
+	longitude = 70.4022
+	latitude = -24.6253
+	altitude = 2648
+	timezone = 4

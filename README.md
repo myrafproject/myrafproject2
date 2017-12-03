@@ -18,14 +18,13 @@
 - Download MYRaf v2.0 Beta
 
 ```
-$ wget https://github.com/myrafproject/myrafproject/releases/download/v2.0-beta.2/myrafproject-2.0-beta.3.tar.gz
-$ tar -xvf myrafproject-2.0-beta.3.tar.gz
+$ git clone https://github.com/myrafproject/myrafproject2.git
 ```
 
 - By installation script (Ubuntu);
 
 ```
-$ cd myrafproject-2.0-beta.3
+$ cd myrafproject2
 $ chmod +x myraf2.0_install.sh
 $ sudo ./myraf2.0_install.sh
 $ sudo chown -R $(whoami):$(whoami) /usr/share/myraf/

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ "$(id -u -n)" == "iraf" ]; then
+	IRAFHOME="/iraf/iraf/local";
+else
+	IRAFHOME="$HOME/.MYRaf2";
+fi
+
+mkdir -p $IRAFHOME;
+pushd "$IRAFHOME" > /dev/null
+
+if [ ! -f "login.cl" ]; then
+	echo xgterm | mkiraf;
+fi
+
+unset LANG
+
+python2.7 /usr/share/myraf/main.py -style QtCurve
+
+popd > /dev/null

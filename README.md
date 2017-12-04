@@ -28,8 +28,31 @@ $ cd myrafproject2
 $ chmod +x myraf2.0_install.sh
 $ sudo ./myraf2.0_install.sh
 $ sudo chown -R $(whoami):$(whoami) /usr/share/myraf/
+$ sudo chown -R $(whoami):$(whoami) /iraf/iraf/noao/lib/obsdb.dat
 $ myraf2
 ```
+
+And close MYRaf, proceed by;
+
+```bash
+# cd ~/.MYRaf2
+# cl
+vocl> noao
+noao> imred
+imred> ccdred
+ccdred> setinst
+```
+then, "enter the ccdred epar menu" and change "instrum" section;
+
+(instrum= ccddb$kpno/camera.dat) CCD instrument file.
+
+Press ":wq" and ":wd" save settings.
+
+```bash
+logout
+$ myraf2
+```
+
 - By manual installation (If you installed MYRaf 2.0 with the installation script, you do not need to continue further).
 
 - Install dependencies

@@ -1586,6 +1586,8 @@ class MyForm(QtGui.QWidget, Ui_Form):
                             function.headerWrite(img, "mytm-obs", tm)
                         else:
                             QtGui.QMessageBox.critical( self,  ("MYRaf Error"), ("Please provide YYYY-MM-DDTHH:MM:SS formatted keyword!"))
+                            break
+                            
                     else:
                         function.headerWrite(img, "mytm-obs", function.headerRead(img, self.ui.lineEdit_17.text()))
                         function.headerWrite(img, "mytm-obs", function.headerRead(img, self.ui.lineEdit_17.text()))

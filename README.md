@@ -35,8 +35,8 @@ $ myraf2
 And close MYRaf, proceed by;
 
 ```bash
-# cd ~/.MYRaf2
-# cl
+$ cd ~/.MYRaf2
+$ cl
 vocl> noao
 noao> imred
 imred> ccdred
@@ -46,7 +46,7 @@ then, "enter the ccdred epar menu" and change "instrum" section;
 
 (instrum= ccddb$kpno/camera.dat) CCD instrument file.
 
-Press ":wq" and ":wd" save settings.
+Press ":wq" and ":wq" save settings.
 
 ```bash
 logout

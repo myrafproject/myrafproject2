@@ -98,7 +98,7 @@ $ sudo chown -R $(whoami):$(whoami) /usr/share/myraf/
 $ myraf2
 ```
 
-If you have any problems during installation, please contact us or create an [issue](https://github.com/myrafproject/myrafproject/issues/new).
+If you have any problems during installation, please contact us or create an [issue](https://github.com/myrafproject/myrafproject2/issues/new).
 
 We tried to create a version that you enjoy it. We wish you clear skies and data with high SNR! :)
 

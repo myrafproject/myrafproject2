@@ -14,8 +14,8 @@
 - Cosmic Ray Cleaner added.
 
 # Installation
-- For the video tutorial click the picture below.
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/XVrDA8rA9hs/0.jpg)](http://www.youtube.com/watch?v=XVrDA8rA9hs)  
+- For the video tutorial click the picture below.  
+[![Video Tutorial](http://img.youtube.com/vi/XVrDA8rA9hs/0.jpg)](http://www.youtube.com/watch?v=XVrDA8rA9hs)  
 - Install IRAF v2.16 and later. If you are using Ubuntu it is easy to install from this [link](http://www.astrosen.unam.mx/%7Efavilac/IRAF/16.04/IRAF_Ubuntu16.04.iso).
 - Download MYRaf v2.0 Beta
 

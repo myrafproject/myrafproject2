@@ -15,7 +15,7 @@
 
 # Installation
 - For the video tutorial click the picture below.
-[![MYRaf v2.0 Beta Video Tutorial](https://img.youtube.com/vi/XVrDA8rA9hs/0.jpg)](https://www.youtube.com/watch?v=XVrDA8rA9hs)
+[[MYRaf v2.0 Beta Video Tutorial](https://img.youtube.com/vi/XVrDA8rA9hs/0.jpg)](https://www.youtube.com/watch?v=XVrDA8rA9hs)
 - Install IRAF v2.16 and later. If you are using Ubuntu it is easy to install from this [link](http://www.astrosen.unam.mx/%7Efavilac/IRAF/16.04/IRAF_Ubuntu16.04.iso).
 - Download MYRaf v2.0 Beta
 

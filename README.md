@@ -15,6 +15,7 @@
 
 # Installation
 - For the video tutorial click the picture below.
+<br>
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=XVrDA8rA9hs
 " target="_blank"><img src="(https://img.youtube.com/vi/XVrDA8rA9hs/0.jpg"
 alt="MYRaf v2.0 Beta Video Tutorial" width="240" height="180" border="10" /></a>

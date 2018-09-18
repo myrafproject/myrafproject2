@@ -84,7 +84,7 @@ except:
     raise SystemExit
 
 try:
-    import alipy
+    import lco_alipy as alipy
     import glob
 except:
     print("Did you install 'alipy'? To furter information:\nhttp://obswww.unige.ch/~tewes/alipy/")

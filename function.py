@@ -155,7 +155,7 @@ def calibration(image, bias, dark, flat, odir, cty="", sub="yes"):
 		return False
 
 
-def autoAlign(self, inFile, refImage, outFile, mkPNG=False, visu=False):
+def autoAlign(self, inFile, refImage, outFile, visu=False):
     print("image = %s, ref = %s " %(inFile, refImage))
     mkh=iraf.artdata.mkheader
     directory = os.path.dirname("%s/alipy_out/" %(self.HOME))
@@ -169,7 +169,7 @@ def autoAlign(self, inFile, refImage, outFile, mkPNG=False, visu=False):
         for id in identifications:
             if id.ok == True:
                 print "%20s : %20s, flux ratio %.2f" % (id.ukn.name, id.trans, id.medfluxratio)
-                alipy.align.affineremap(id.ukn.filepath, id.trans, shape=outputshape, makepng=mkPNG)
+                alipy.align.affineremap(id.ukn.filepath, id.trans, shape=outputshape)
                 
         alipy_out = "%s/alipy_out/%s_affineremap.fits" %(self.HOME, ntpath.basename(str(inFile)).split(".")[0])
         mkh(alipy_out, inFile)
@@ -177,8 +177,8 @@ def autoAlign(self, inFile, refImage, outFile, mkPNG=False, visu=False):
         os.popen("mv -f %s %s/%s" %(alipy_out, outFile, ntpath.basename(str(inFile))))
         print("alipy succeed.")
         return True
-    except:
-        print("alipy failed.")
+    except Exception as e:
+        print(e)
         return False
         
 def manAlign(inFile, x, y, outFile):

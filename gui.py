@@ -7,11 +7,13 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as md
 
 def PlotFunc(self,  chartDevice,  Phase,  diffMag,  residual,  pColor, legend, shape):
-    print(chartDevice)
-    chartDevice.ax.hold(True)
-    chartDevice.ax.plot(Phase, diffMag, shape,  color = "%s" %(pColor),  label = "%s" %(legend), picker=5)
-    chartDevice.ax.legend(shadow = True, loc = (1, 0.5), numpoints = 1,  prop={'size':10})
-    chartDevice.draw()
+	print(chartDevice)
+	chartDevice.axlc1.hold(True)
+	chartDevice.axlc2.hold(True)
+	chartDevice.axlc1.plot(Phase, diffMag, shape,  color = "%s" %(pColor), label = "%s" %(legend), picker=5)
+	chartDevice.axlc2.plot(Phase, residual, shape, color="%s" % (pColor), picker=5)
+	chartDevice.axlc1.legend(shadow = True, loc = (1, 0.5), numpoints = 1,  prop={'size':10})
+	chartDevice.draw()
 
 def add(self, flist):
 	filename = QtGui.QFileDialog.getOpenFileNames(self ,"Images...","",("Fit or Fits (*.fits *.fit)"))

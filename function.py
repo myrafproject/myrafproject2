@@ -1,22 +1,37 @@
 import os, datetime, ntpath, alipy, glob
 from pyraf import iraf
-from pyraf.iraf import noao, imred, ccdred, darkcombine, flatcombine, ccdproc ,astutil, setjd, setairmass, asthedit, digiphot, apphot, phot, ptools, txdump, artdata, imgeom
+# from pyraf.iraf import noao, imred, ccdred, darkcombine, flatcombine, ccdproc ,astutil, setjd, setairmass, asthedit, digiphot, apphot, phot, ptools, txdump, artdata, imgeom
 from astropy.time import Time
 from time import gmtime, strftime
+
 try:
     import cosmics
 except:
 	print("Can not load cosmics")
 	raise SystemExit
 
-def readResultFile(self, filename,  starID, apIndex):
+from astropy.table import Table
+from astropy import table
+from astropy.io import ascii
+
+
+def readResultFile(self, filename, starID, ifilter, apIndex):
     try:
-        os.popen("cat %s |awk '{if ($1 == %s) print $1, $2, $%s}' > %s/tmp/idjdmag_%s.my" %(filename, starID, apIndex, self.HOME, starID))
+        result_file = Table.read(filename,
+                                 format='ascii.commented_header', header_start=-1)
+
+        result_unique_by_keys = table.unique(result_file, keys='FILTER')
+
+        results = result_file[(result_file['FILTER'] == ifilter) & (result_file['id'] == int(starID))]
+
+        # ifilter_index = result_unique_by_keys.colnames.index('FILTER') + 1
+        ascii.write(results['id', 'TIME', result_unique_by_keys.colnames[apIndex], 'FILTER'], "{0}/tmp/idjdmag_{1}_{2}.my".format(self.HOME, starID, ifilter))
         print "Result file is succesfuly read."
         return True
     except:
         print "Result file did not read"
         return False
+
         
 def headerRead(filename, field):
     res = iraf.hedit(filename, field, ".", Stdout=1)

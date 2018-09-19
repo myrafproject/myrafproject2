@@ -11,8 +11,6 @@ import logging
 from ginga.mplw.ImageViewCanvasMpl import ImageViewCanvas
 from ginga.mplw.FigureCanvasQt import setup_Qt
 from ginga.AstroImage import AstroImage
-from ginga.misc import log
-from ginga import cmap
 
 class FitsPlot(object):
     def __init__(self, chartDev):
@@ -21,10 +19,12 @@ class FitsPlot(object):
         # use_logger = False
         # logger = log.get_logger(null=not use_logger, log_stderr=True)
         # self.logger = logger
-	self.logger = None
+        self.logger = None
         # create a ginga object and tell it about the figure
         self.chartDev.fig.clf()
         fi = ImageViewCanvas(logger=self.logger)
+        # Two subplots, the axes array is 1-d
+
         fi.enable_autocuts('on')
         fi.set_autocut_params('zscale')
         fi.set_figure(self.chartDev.fig)

@@ -89,7 +89,10 @@ try:
 except:
     print("Did you install 'alipy'? To furter information:\nhttp://obswww.unige.ch/~tewes/alipy/")
     os.system("echo \"-- " + str(datetime.datetime.utcnow()) + " - Where is alipy & glob?\">>$HOME/.MYRaf2/log.my")
-    raise SystemExit    
+    raise SystemExit
+
+from astropy.table import Table
+from astropy import table
 
 
 class MyForm(QtGui.QWidget, Ui_Form):
@@ -673,7 +676,7 @@ class MyForm(QtGui.QWidget, Ui_Form):
                 if self.ui.checkBox_11.isChecked():
                     refImage = self.ui.listWidget_13.currentItem()
                     refImage = str(refImage.text())
-                    if not function.autoAlign(self, iImg, refImage, os.path.split(iImg)[0], mkPNG=False, visu=False):
+                    if not function.autoAlign(self, iImg, refImage, os.path.split(iImg)[0], visu=False):
                         self.ui.label_71.setText("Can not align %s" %(ntpath.basename(str(iImg))))
                 
                 if self.ui.groupBox_29.isChecked():
@@ -1099,29 +1102,41 @@ class MyForm(QtGui.QWidget, Ui_Form):
   def readStars(self):
     filename = QtGui.QFileDialog.getOpenFileName(self ,"MYRaf Result File...","",("My Files (*.my *.myf)"))
     if filename:
-        try:    
-            self.ui.label_43.setText(QtGui.QApplication.translate("Form", "File location: %s" %(filename), None, QtGui.QApplication.UnicodeUTF8))
-            # counting stars in result file
-            with open(filename) as resultFile:
-                head=[resultFile.next() for x in xrange(3)]
-            capStar, starCount = head[0].split(" = ")
-            capStar, apertures = head[1].split(" = ")
-            #clearing comboxBoxs
-            self.ui.comboBox_11.clear()
-            self.ui.comboBox_12.clear()
-            self.ui.comboBox_13.clear()
-            for i in range(1, int(starCount.replace("\n",""))+1):
-                self.ui.comboBox_11.addItem(str(i))
-                self.ui.comboBox_12.addItem(str(i))
-                self.ui.comboBox_13.addItem(str(i))
-            self.ui.comboBox_14.clear()
-            #getting apertures
-            apertures = apertures.replace("\n","")
-            for aperture in apertures.split(","):
-                self.ui.comboBox_14.addItem(aperture.replace("\n", ""))
-        except:
+
+        self.ui.label_43.setText(QtGui.QApplication.translate("Form", "File location: %s" %(filename), None, QtGui.QApplication.UnicodeUTF8))
+        # counting stars in result file
+        with open(filename) as resultFile:
+            head=[resultFile.next() for x in xrange(3)]
+        capStar, starCount = head[0].split(" = ")
+        capStar, apertures = head[1].split(" = ")
+
+        result_file = Table.read(filename,
+                                 format='ascii.commented_header', header_start=-1)
+
+        result_unique_by_keys = table.unique(result_file, keys='FILTER')
+
+        result_unique_by_keys.colnames.index('FILTER')
+
+        #clearing comboxBoxs
+        self.ui.comboBox_11.clear()
+        self.ui.comboBox_12.clear()
+        self.ui.comboBox_13.clear()
+
+        for ifilter in result_unique_by_keys['FILTER']:
+            self.ui.comboBox_filter.addItem(str(ifilter))
+
+        for i in range(1, int(starCount.replace("\n",""))+1):
+            self.ui.comboBox_11.addItem(str(i))
+            self.ui.comboBox_12.addItem(str(i))
+            self.ui.comboBox_13.addItem(str(i))
+        self.ui.comboBox_14.clear()
+        #getting apertures
+        apertures = apertures.replace("\n","")
+        for aperture in apertures.split(","):
+            self.ui.comboBox_14.addItem(aperture.replace("\n", ""))
+        """except:
             QtGui.QMessageBox.critical( self,  ("MYRaf Error"), ("Error reading MYRaf <b>result file</b>!"))
-            gui.logging(self, "--- %s - Error reading MYRaf result file!" %(datetime.datetime.utcnow()))            
+            gui.logging(self, "--- %s - Error reading MYRaf result file!" %(datetime.datetime.utcnow()))    """
 
 #Plot Chart#############################################
   def plotChart(self):
@@ -1132,26 +1147,28 @@ class MyForm(QtGui.QWidget, Ui_Form):
             varStarID = self.ui.comboBox_11.currentText()
             checkStarID = self.ui.comboBox_12.currentText()
             refStarID = self.ui.comboBox_13.currentText()
+            ifilter = self.ui.comboBox_filter.currentText()
             apertureIndex = self.ui.comboBox_14.currentIndex() + 3
             legendName = self.ui.lineEdit_21.text().replace(" ",  "")
             
             # reading result file
             neednt,  filename = self.ui.label_43.text().split(":")
             filename = filename.replace("\n", "")
-            function.readResultFile(self, filename, varStarID, apertureIndex)
-            function.readResultFile(self, filename, checkStarID, apertureIndex)
-            function.readResultFile(self, filename, refStarID, apertureIndex)
+            filename = filename.replace(" ", "")
+            function.readResultFile(self, filename, varStarID, ifilter, apertureIndex)
+            function.readResultFile(self, filename, checkStarID, ifilter, apertureIndex)
+            function.readResultFile(self, filename, refStarID, ifilter, apertureIndex)
             
             # varStar
-            filep = open("%s/tmp/idjdmag_%s.my" %(self.HOME, varStarID), "r")
+            filep = open("%s/tmp/idjdmag_%s_%s.my" %(self.HOME, varStarID, ifilter), "r")
             varDatas = filep.readlines()
             filep.close()
             # checkStar
-            filep = open("%s/tmp/idjdmag_%s.my" %(self.HOME, checkStarID), "r")
+            filep = open("%s/tmp/idjdmag_%s_%s.my" %(self.HOME, checkStarID, ifilter), "r")
             checkDatas = filep.readlines()
             filep.close()
             # refStar
-            filep = open("%s/tmp/idjdmag_%s.my" %(self.HOME, refStarID), "r")
+            filep = open("%s/tmp/idjdmag_%s_%s.my" %(self.HOME, refStarID, ifilter), "r")
             refDatas = filep.readlines()
             filep.close()  
             # numpy operations
@@ -1208,7 +1225,7 @@ class MyForm(QtGui.QWidget, Ui_Form):
             #Plot
             pointColor = self.ui.label_55.text()
             sp = str(self.ui.comboBox_15.currentText()).split(" ")[0]
-            gui.PlotFunc(self,  self.ui.disp_chart.canvas, varPhase, (diffMag*(-1)),  residuMag, pointColor,  legendName, sp)
+            gui.PlotFunc(self, self.ui.disp_chart.canvas, varPhase, (diffMag*(-1)), residuMag, pointColor,  legendName, sp)
         else:
             QtGui.QMessageBox.critical( self,  ("MYRaf Error"), ("Please <b>fill/select</b> the required informations!"))
             gui.logging(self, "--- %s - Please fill/select the required informations!" %(datetime.datetime.utcnow()))

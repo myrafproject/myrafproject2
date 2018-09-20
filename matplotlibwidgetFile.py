@@ -12,7 +12,6 @@ class MplCanvas(FigureCanvas):
     def __init__(self):
 
         self.fig = Figure(facecolor = '#FFFFFF')
-        # self.ax = self.fig.add_subplot(111)
         self.fig.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9)
         gs = gridspec.GridSpec(2, 1, height_ratios=[6, 2])
         self.axlc1 = self.fig.add_subplot(gs[0])

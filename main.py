@@ -1074,8 +1074,10 @@ class MyForm(QtGui.QWidget, Ui_Form):
   #Chart area clear
   def chartClear(self):
     data = []
-    self.ui.disp_chart.canvas.ax.hold(False)
-    self.ui.disp_chart.canvas.ax.plot(data) 
+    self.ui.disp_chart.canvas.axlc1.hold(False)
+    self.ui.disp_chart.canvas.axlc1.plot(data)
+    self.ui.disp_chart.canvas.axlc2.hold(False)
+    self.ui.disp_chart.canvas.axlc2.plot(data)
     self.ui.disp_chart.canvas.draw()
      
 #Choose Point Color of Chart###################################
@@ -1145,87 +1147,63 @@ class MyForm(QtGui.QWidget, Ui_Form):
         #Checking result file
         if self.ui.lineEdit_19.text() and self.ui.lineEdit_20.text() and self.ui.lineEdit_21.text() and self.ui.label_55.text() and self.ui.comboBox_11.currentText() and self.ui.comboBox_12.currentText() and self.ui.comboBox_13.currentText() and self.ui.comboBox_14.currentText():
             varStarID = self.ui.comboBox_11.currentText()
-            checkStarID = self.ui.comboBox_12.currentText()
-            refStarID = self.ui.comboBox_13.currentText()
+            compStarID = self.ui.comboBox_12.currentText()
+            checkStarID = self.ui.comboBox_13.currentText()
             ifilter = self.ui.comboBox_filter.currentText()
             apertureIndex = self.ui.comboBox_14.currentIndex() + 3
             legendName = self.ui.lineEdit_21.text().replace(" ",  "")
+            t0 = float(self.ui.lineEdit_19.text())
+            period = float(self.ui.lineEdit_20.text())
             
             # reading result file
             neednt,  filename = self.ui.label_43.text().split(":")
             filename = filename.replace("\n", "")
             filename = filename.replace(" ", "")
-            function.readResultFile(self, filename, varStarID, ifilter, apertureIndex)
-            function.readResultFile(self, filename, checkStarID, ifilter, apertureIndex)
-            function.readResultFile(self, filename, refStarID, ifilter, apertureIndex)
-            
-            # varStar
-            filep = open("%s/tmp/idjdmag_%s_%s.my" %(self.HOME, varStarID, ifilter), "r")
-            varDatas = filep.readlines()
-            filep.close()
-            # checkStar
-            filep = open("%s/tmp/idjdmag_%s_%s.my" %(self.HOME, checkStarID, ifilter), "r")
-            checkDatas = filep.readlines()
-            filep.close()
-            # refStar
-            filep = open("%s/tmp/idjdmag_%s_%s.my" %(self.HOME, refStarID, ifilter), "r")
-            refDatas = filep.readlines()
-            filep.close()  
-            # numpy operations
-            varPhase1 = []
-            varMag1 = []
-            checkMag1 = []
-            refMag1 = []
-            diffMag = []
-            residuMag = []
-            # Variable
-            for varData in varDatas:
-                vData = varData.split()
-                try:
-                    varPhase1.append(((float(vData[1]) - float(self.ui.lineEdit_19.text()))/(float(self.ui.lineEdit_20.text()))) - int(((float(vData[1]) - float(self.ui.lineEdit_19.text()))/(float(self.ui.lineEdit_20.text())))))
-                    varMag1.append(float(vData[2]))
-                except:
-                    varMag1.append(np.nan)
-            # Check
-            for checkData in checkDatas:
-                cData = checkData.split()
-                try:
-                    checkMag1.append(float(cData[2]))
-                except:
-                    checkMag1.append(np.nan)
-            # Ref
-            for refData in refDatas:
-                rData = refData.split()
-                try:
-                    refMag1.append(float(rData[2]))
-                except:
-                    refMag1.append(np.nan)
-             
-            # Masking INDEF content
-            varPhase = np.array(varPhase1)
-            varMag2 = np.array(varMag1)
-            varMag = np.ma.masked_array(varMag2, np.isnan(varMag2))
-            
-            checkMag2 = np.array(checkMag1)
-            checkMag = np.ma.masked_array(checkMag2, np.isnan(checkMag2))
-            
-            refMag2 = np.array(refMag1)
-            refMag = np.ma.masked_array(refMag2, np.isnan(refMag2))
-            # Rejecting scattered points from array
-            # diffMag1 = varMag - checkMag
-            # diffMag = sigma_clip(diffMag1, 3, None, mean, copy=False)
-            
-            # residuMag1 = checkMag - refMag
-            # residuMag = sigma_clip(residuMag1, 3, None, mean, copy=False)
+            variable_star = function.readResultFile(self, filename, varStarID, ifilter, apertureIndex)
+            comp_star = function.readResultFile(self, filename, compStarID, ifilter, apertureIndex)
+            check_star = function.readResultFile(self, filename, checkStarID, ifilter, apertureIndex)
 
-            diffMag = varMag - checkMag
-            
-            residuMag = checkMag - refMag
+            # aperture colomn names
+            mag_column = variable_star.colnames[apertureIndex - 1]
+
+            variable_star['diffMag'] = variable_star[mag_column].astype(float) - comp_star[mag_column].astype(float)
+            variable_star['residuMag'] = comp_star[mag_column].astype(float) - check_star[mag_column].astype(float)
+
+            variable_star['phase'] = ((variable_star['TIME'].astype(float) - t0) / period) - ((variable_star['TIME'].astype(float) - t0) / period).astype(int)
+            print(variable_star['phase'])
             
             #Plot
             pointColor = self.ui.label_55.text()
             sp = str(self.ui.comboBox_15.currentText()).split(" ")[0]
-            gui.PlotFunc(self, self.ui.disp_chart.canvas, varPhase, (diffMag*(-1)), residuMag, pointColor,  legendName, sp)
+            gui.PlotFunc(self, self.ui.disp_chart.canvas, variable_star['phase'], (variable_star['diffMag']*(-1)), variable_star['residuMag'], pointColor,  legendName, sp)
+            head, tail = os.path.split(filename)
+            self.ui.disp_chart.canvas.axlc1.title.set_fontsize(10)
+            self.ui.disp_chart.canvas.axlc1.set_title(tail.replace(".my", " Light Curve"))
+            self.ui.disp_chart.canvas.axlc2.set_xlabel("Phase", fontsize = 9)
+            self.ui.disp_chart.canvas.axlc1.set_ylabel("V - C", fontsize = 9)
+            self.ui.disp_chart.canvas.axlc2.set_ylabel("C - R", fontsize = 9)
+
+            labels_x1 = self.ui.disp_chart.canvas.axlc1.get_xticklabels()
+            labels_y1 = self.ui.disp_chart.canvas.axlc1.get_yticklabels()
+
+            labels_x2 = self.ui.disp_chart.canvas.axlc2.get_xticklabels()
+            labels_y2 = self.ui.disp_chart.canvas.axlc2.get_yticklabels()
+
+            for xlabel in labels_x1:
+                xlabel.set_fontsize(8)
+                xlabel.set_color('b')
+            for ylabel in labels_y1:
+                ylabel.set_fontsize(8)
+                ylabel.set_color('b')
+
+            for xlabel in labels_x2:
+                xlabel.set_fontsize(8)
+                xlabel.set_color('b')
+            for ylabel in labels_y2:
+                ylabel.set_fontsize(8)
+                ylabel.set_color('b')
+
+            self.ui.disp_chart.canvas.draw()
         else:
             QtGui.QMessageBox.critical( self,  ("MYRaf Error"), ("Please <b>fill/select</b> the required informations!"))
             gui.logging(self, "--- %s - Please fill/select the required informations!" %(datetime.datetime.utcnow()))

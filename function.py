@@ -25,9 +25,9 @@ def readResultFile(self, filename, starID, ifilter, apIndex):
         results = result_file[(result_file['FILTER'] == ifilter) & (result_file['id'] == int(starID))]
 
         # ifilter_index = result_unique_by_keys.colnames.index('FILTER') + 1
-        ascii.write(results['id', 'TIME', result_unique_by_keys.colnames[apIndex], 'FILTER'], "{0}/tmp/idjdmag_{1}_{2}.my".format(self.HOME, starID, ifilter))
+        # ascii.write(results['id', 'TIME', result_unique_by_keys.colnames[apIndex], 'FILTER'], "{0}/tmp/idjdmag_{1}_{2}.my".format(self.HOME, starID, ifilter))
         print "Result file is succesfuly read."
-        return True
+        return results
     except:
         print "Result file did not read"
         return False

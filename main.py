@@ -93,6 +93,7 @@ except:
 
 from astropy.table import Table
 from astropy import table
+from astropy.io import ascii
 
 
 class MyForm(QtGui.QWidget, Ui_Form):
@@ -1145,13 +1146,12 @@ class MyForm(QtGui.QWidget, Ui_Form):
     # reading form
     if self.ui.label_43.text():
         #Checking result file
-        if self.ui.lineEdit_19.text() and self.ui.lineEdit_20.text() and self.ui.lineEdit_21.text() and self.ui.label_55.text() and self.ui.comboBox_11.currentText() and self.ui.comboBox_12.currentText() and self.ui.comboBox_13.currentText() and self.ui.comboBox_14.currentText():
+        if self.ui.lineEdit_19.text() and self.ui.lineEdit_20.text() and self.ui.label_55.text() and self.ui.comboBox_11.currentText() and self.ui.comboBox_12.currentText() and self.ui.comboBox_13.currentText() and self.ui.comboBox_14.currentText():
             varStarID = self.ui.comboBox_11.currentText()
             compStarID = self.ui.comboBox_12.currentText()
             checkStarID = self.ui.comboBox_13.currentText()
             ifilter = self.ui.comboBox_filter.currentText()
             apertureIndex = self.ui.comboBox_14.currentIndex() + 3
-            legendName = self.ui.lineEdit_21.text().replace(" ",  "")
             t0 = float(self.ui.lineEdit_19.text())
             period = float(self.ui.lineEdit_20.text())
             
@@ -1165,17 +1165,27 @@ class MyForm(QtGui.QWidget, Ui_Form):
 
             # aperture colomn names
             mag_column = variable_star.colnames[apertureIndex - 1]
+            mag_err_column = mag_column.replace("MAG", "MERR")
 
             variable_star['diffMag'] = variable_star[mag_column].astype(float) - comp_star[mag_column].astype(float)
-            variable_star['residuMag'] = comp_star[mag_column].astype(float) - check_star[mag_column].astype(float)
+            variable_star['diffMag_err'] = np.sqrt(np.power(variable_star[mag_err_column].astype(float), 2) + np.power(comp_star[mag_err_column].astype(float), 2))
+            variable_star['checkDiffMag'] = comp_star[mag_column].astype(float) - check_star[mag_column].astype(float)
+            variable_star['checkDiffMag_err'] = np.sqrt(np.power(comp_star[mag_err_column].astype(float), 2) + np.power(check_star[mag_err_column].astype(float), 2))
 
-            variable_star['phase'] = ((variable_star['TIME'].astype(float) - t0) / period) - ((variable_star['TIME'].astype(float) - t0) / period).astype(int)
-            print(variable_star['phase'])
+            variable_star['phase'] = ((variable_star['TIME'].astype(float) - t0) / period) \
+                                     - ((variable_star['TIME'].astype(float) - t0) / period).astype(int)
             
             #Plot
             pointColor = self.ui.label_55.text()
             sp = str(self.ui.comboBox_15.currentText()).split(" ")[0]
-            gui.PlotFunc(self, self.ui.disp_chart.canvas, variable_star['phase'], (variable_star['diffMag']*(-1)), variable_star['residuMag'], pointColor,  legendName, sp)
+            gui.PlotFunc(self, self.ui.disp_chart.canvas, variable_star['phase'],
+                         (variable_star['diffMag']*(-1)),
+                         variable_star['checkDiffMag'],
+                         variable_star['diffMag_err'],
+                         variable_star['checkDiffMag_err'],
+                         pointColor,
+                         "{0} - Ap. ({1})".format(ifilter, self.ui.comboBox_14.currentText()),
+                         sp)
             head, tail = os.path.split(filename)
             self.ui.disp_chart.canvas.axlc1.title.set_fontsize(10)
             self.ui.disp_chart.canvas.axlc1.set_title(tail.replace(".my", " Light Curve"))
@@ -1204,6 +1214,37 @@ class MyForm(QtGui.QWidget, Ui_Form):
                 ylabel.set_color('b')
 
             self.ui.disp_chart.canvas.draw()
+            ofile_name = tail.replace(".my", "_lc_{0}".format(ifilter))
+
+            if self.ui.checkBox_export_result.checkState() == QtCore.Qt.Checked:
+                result_file = QtGui.QFileDialog.getSaveFileName(self, "Save MYRaf Light Curve file", ofile_name,
+                                                                filter="txt (*.txt *.)")
+                variable_star['phase'].format = '.4f'
+                variable_star['diffMag'].format = '.3f'
+                variable_star['diffMag_err'].format = '.3f'
+                variable_star['checkDiffMag'].format = '.3f'
+                variable_star['checkDiffMag_err'].format = '.3f'
+
+                ascii.write(variable_star["id",
+                                          "TIME-OBS",
+                                          "DATE-OBS",
+                                          "TIME",
+                                          "phase",
+                                          mag_column,
+                                          mag_err_column,
+                                          "diffMag",
+                                          "diffMag_err",
+                                          "checkDiffMag",
+                                          "checkDiffMag_err",
+                                          "FILTER",
+                                          "AIRMASS"],
+                            result_file,
+                            comment=False,
+                            overwrite=True)
+
+            else:
+                print("LC export mode disable!")
+
         else:
             QtGui.QMessageBox.critical( self,  ("MYRaf Error"), ("Please <b>fill/select</b> the required informations!"))
             gui.logging(self, "--- %s - Please fill/select the required informations!" %(datetime.datetime.utcnow()))

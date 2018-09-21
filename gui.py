@@ -1,19 +1,30 @@
 from PyQt4 import QtGui, QtCore
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
-import os, datetime,  dateutil,  time
-import datetime as dt
-import matplotlib.pyplot as plt
-import matplotlib.dates as md
+import os
 
-def PlotFunc(self,  chartDevice,  Phase,  diffMag,  residual,  pColor, legend, shape):
-	print(chartDevice)
+
+def PlotFunc(self, chartDevice, Phase, diffMag, residual, diffMag_err, checkDiffMag_err, pColor, legend, shape):
 	chartDevice.axlc1.hold(True)
 	chartDevice.axlc2.hold(True)
-	chartDevice.axlc1.plot(Phase, diffMag, shape,  color = "%s" %(pColor), label = "%s" %(legend), picker=5)
-	chartDevice.axlc2.plot(Phase, residual, shape, color="%s" % (pColor), picker=5)
+	chartDevice.axlc1.errorbar(
+		Phase,
+		diffMag,
+		yerr=diffMag_err,
+		fmt=shape,
+		ecolor="#c3c3c3",
+		color=pColor,
+		capsize=2,
+		label = "%s" %(legend),
+		picker=5)
+	chartDevice.axlc2.errorbar(
+		Phase,
+		residual,
+		yerr=checkDiffMag_err,
+		fmt=shape,
+		ecolor="#c3c3c3",
+		color=pColor,
+		capsize=2,
+		picker=5)
 	chartDevice.axlc1.legend(shadow = True, loc = (1, 0.5), numpoints = 1,  prop={'size':10})
-	# chartDevice.draw()
 
 def add(self, flist):
 	filename = QtGui.QFileDialog.getOpenFileNames(self ,"Images...","",("Fit or Fits (*.fits *.fit)"))

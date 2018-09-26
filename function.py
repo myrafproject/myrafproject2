@@ -1,5 +1,6 @@
 import os, datetime, ntpath, alipy, glob
 from pyraf import iraf
+import numpy as np
 # from pyraf.iraf import noao, imred, ccdred, darkcombine, flatcombine, ccdproc ,astutil, setjd, setairmass, asthedit, digiphot, apphot, phot, ptools, txdump, artdata, imgeom
 from astropy.time import Time
 from time import gmtime, strftime
@@ -17,7 +18,9 @@ from astropy import table
 def readResultFile(self, filename, starID, ifilter, apIndex):
     try:
         result_file = Table.read(filename,
-                                 format='ascii.commented_header', header_start=-1)
+                                 format='ascii.commented_header',
+                                 header_start=-1,
+                                 fill_values=[('INDEF', np.nan)])
 
         result_unique_by_keys = table.unique(result_file, keys='FILTER')
 

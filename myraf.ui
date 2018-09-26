@@ -2498,7 +2498,7 @@
             <set>Qt::AlignCenter</set>
            </property>
            <layout class="QGridLayout" name="gridLayout_93">
-            <item row="8" column="0">
+            <item row="9" column="0">
              <layout class="QGridLayout" name="gridLayout_74">
               <item row="1" column="0">
                <widget class="QLineEdit" name="lineEdit_19">
@@ -2537,7 +2537,7 @@
               </item>
              </layout>
             </item>
-            <item row="9" column="0">
+            <item row="10" column="0">
              <layout class="QGridLayout" name="gridLayout_75">
               <item row="1" column="0">
                <widget class="QLineEdit" name="lineEdit_20">
@@ -2573,10 +2573,10 @@
               </item>
              </layout>
             </item>
-            <item row="10" column="0">
+            <item row="11" column="0">
              <layout class="QGridLayout" name="gridLayout_90"/>
             </item>
-            <item row="11" column="0">
+            <item row="12" column="0">
              <layout class="QGridLayout" name="gridLayout_92">
               <item row="0" column="0">
                <widget class="QPushButton" name="pushButton_2">
@@ -2819,10 +2819,17 @@
               </item>
              </layout>
             </item>
-            <item row="12" column="0">
+            <item row="13" column="0">
              <widget class="QCheckBox" name="checkBox_export_result">
               <property name="text">
                <string>Export result</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0">
+             <widget class="QCheckBox" name="checkBox_t0_p">
+              <property name="text">
+               <string>Disable T0/P</string>
               </property>
              </widget>
             </item>
@@ -4322,7 +4329,7 @@
        <item row="0" column="0" colspan="2">
         <widget class="QTabWidget" name="tabWidget_6">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tab_23">
           <attribute name="title">

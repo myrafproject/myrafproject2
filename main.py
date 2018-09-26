@@ -243,6 +243,7 @@ class MyForm(QtGui.QWidget, Ui_Form):
     
     self.ui.checkBox_4.clicked.connect(self.epochUnlock)
     self.ui.checkBox_12.clicked.connect(self.timeobsUnlock)
+    self.ui.checkBox_t0_p.clicked.connect(self.t0_period_Unlock)
     # self.ui.checkBox_12.clicked.connect(self.timeStampUnlock)
     
     self.ui.pushButton_19.clicked.connect(self.chartClear)
@@ -1124,6 +1125,7 @@ class MyForm(QtGui.QWidget, Ui_Form):
         self.ui.comboBox_11.clear()
         self.ui.comboBox_12.clear()
         self.ui.comboBox_13.clear()
+        self.ui.comboBox_filter.clear()
 
         for ifilter in result_unique_by_keys['FILTER']:
             self.ui.comboBox_filter.addItem(str(ifilter))
@@ -1146,15 +1148,13 @@ class MyForm(QtGui.QWidget, Ui_Form):
     # reading form
     if self.ui.label_43.text():
         #Checking result file
-        if self.ui.lineEdit_19.text() and self.ui.lineEdit_20.text() and self.ui.label_55.text() and self.ui.comboBox_11.currentText() and self.ui.comboBox_12.currentText() and self.ui.comboBox_13.currentText() and self.ui.comboBox_14.currentText():
+        if self.ui.label_55.text() and self.ui.comboBox_11.currentText() and self.ui.comboBox_12.currentText() and self.ui.comboBox_13.currentText() and self.ui.comboBox_14.currentText():
             varStarID = self.ui.comboBox_11.currentText()
             compStarID = self.ui.comboBox_12.currentText()
             checkStarID = self.ui.comboBox_13.currentText()
             ifilter = self.ui.comboBox_filter.currentText()
             apertureIndex = self.ui.comboBox_14.currentIndex() + 3
-            t0 = float(self.ui.lineEdit_19.text())
-            period = float(self.ui.lineEdit_20.text())
-            
+
             # reading result file
             neednt,  filename = self.ui.label_43.text().split(":")
             filename = filename.replace("\n", "")
@@ -1163,22 +1163,40 @@ class MyForm(QtGui.QWidget, Ui_Form):
             comp_star = function.readResultFile(self, filename, compStarID, ifilter, apertureIndex)
             check_star = function.readResultFile(self, filename, checkStarID, ifilter, apertureIndex)
 
+
             # aperture colomn names
             mag_column = variable_star.colnames[apertureIndex - 1]
             mag_err_column = mag_column.replace("MAG", "MERR")
 
             variable_star['diffMag'] = variable_star[mag_column].astype(float) - comp_star[mag_column].astype(float)
-            variable_star['diffMag_err'] = np.sqrt(np.power(variable_star[mag_err_column].astype(float), 2) + np.power(comp_star[mag_err_column].astype(float), 2))
+            variable_star['diffMag_err'] = np.sqrt(np.power(variable_star[mag_err_column].astype(float), 2) + np.power(
+                comp_star[mag_err_column].astype(float), 2))
             variable_star['checkDiffMag'] = comp_star[mag_column].astype(float) - check_star[mag_column].astype(float)
-            variable_star['checkDiffMag_err'] = np.sqrt(np.power(comp_star[mag_err_column].astype(float), 2) + np.power(check_star[mag_err_column].astype(float), 2))
+            variable_star['checkDiffMag_err'] = np.sqrt(np.power(comp_star[mag_err_column].astype(float), 2) + np.power(
+                check_star[mag_err_column].astype(float), 2))
 
-            variable_star['phase'] = ((variable_star['TIME'].astype(float) - t0) / period) \
-                                     - ((variable_star['TIME'].astype(float) - t0) / period).astype(int)
-            
+
+            if self.ui.checkBox_t0_p.checkState() != QtCore.Qt.Checked:
+                x_axis = "Phase"
+                if self.ui.lineEdit_19.text() and self.ui.lineEdit_20.text():
+                    t0 = float(self.ui.lineEdit_19.text())
+                    period = float(self.ui.lineEdit_20.text())
+                else:
+                    print("T0 and Period is not found! Setting T0=0 and P=1...")
+                    self.ui.lineEdit_19.setText("0")
+                    self.ui.lineEdit_20.setText("1")
+                    t0 = 0
+                    period = 1
+
+                variable_star[x_axis] = ((variable_star['TIME'].astype(float) - t0) / period) \
+                                         - ((variable_star['TIME'].astype(float) - t0) / period).astype(int)
+            else:
+                x_axis = "TIME"
+
             #Plot
             pointColor = self.ui.label_55.text()
             sp = str(self.ui.comboBox_15.currentText()).split(" ")[0]
-            gui.PlotFunc(self, self.ui.disp_chart.canvas, variable_star['phase'],
+            gui.PlotFunc(self, self.ui.disp_chart.canvas, variable_star[x_axis],
                          (variable_star['diffMag']*(-1)),
                          variable_star['checkDiffMag'],
                          variable_star['diffMag_err'],
@@ -1189,7 +1207,9 @@ class MyForm(QtGui.QWidget, Ui_Form):
             head, tail = os.path.split(filename)
             self.ui.disp_chart.canvas.axlc1.title.set_fontsize(10)
             self.ui.disp_chart.canvas.axlc1.set_title(tail.replace(".my", " Light Curve"))
-            self.ui.disp_chart.canvas.axlc2.set_xlabel("Phase", fontsize = 9)
+            if x_axis == "TIME":
+                x_axis = "HJD"
+            self.ui.disp_chart.canvas.axlc2.set_xlabel(x_axis, fontsize = 9)
             self.ui.disp_chart.canvas.axlc1.set_ylabel("V - C", fontsize = 9)
             self.ui.disp_chart.canvas.axlc2.set_ylabel("C - R", fontsize = 9)
 
@@ -1226,8 +1246,6 @@ class MyForm(QtGui.QWidget, Ui_Form):
                 variable_star['checkDiffMag_err'].format = '.3f'
 
                 ascii.write(variable_star["id",
-                                          "TIME-OBS",
-                                          "DATE-OBS",
                                           "TIME",
                                           "phase",
                                           mag_column,
@@ -1387,6 +1405,14 @@ class MyForm(QtGui.QWidget, Ui_Form):
         self.ui.lineEdit_25.setEnabled(False)
     else:
         self.ui.lineEdit_25.setEnabled(True)
+
+  def t0_period_Unlock(self):
+    if self.ui.checkBox_t0_p.checkState() == QtCore.Qt.Checked:
+        self.ui.lineEdit_19.setEnabled(False)
+        self.ui.lineEdit_20.setEnabled(False)
+    else:
+        self.ui.lineEdit_19.setEnabled(True)
+        self.ui.lineEdit_20.setEnabled(True)
         
   def timeobsUnlock(self):
     if self.ui.checkBox_12.checkState() == QtCore.Qt.Checked:

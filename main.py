@@ -39,10 +39,10 @@ try:
         sip.setapi(api, 2)
     
     import os
-    os.environ['QT_API'] = 'pyqt'
+    os.environ['QT_API'] = 'pyqt4'
     # force matplotlib to use Qt4 backend
     import matplotlib
-    matplotlib.use('Qt4Agg')
+    matplotlib.use('Qt4Agg', force=True)
     
     from PyQt4 import QtGui, QtCore
     from PyQt4.QtGui import *
@@ -83,13 +83,9 @@ except:
     os.system("echo \"-- " + str(datetime.datetime.utcnow()) + " - Did you install PyRAF, iraf?\">>$HOME/.MYRaf2/log.my")
     raise SystemExit
 
-try:
-    import lco_alipy as alipy
-    import glob
-except:
-    print("Did you install 'alipy'? To furter information:\nhttp://obswww.unige.ch/~tewes/alipy/")
-    os.system("echo \"-- " + str(datetime.datetime.utcnow()) + " - Where is alipy & glob?\">>$HOME/.MYRaf2/log.my")
-    raise SystemExit
+
+import alipy
+import glob
 
 from astropy.table import Table
 from astropy import table
@@ -255,6 +251,7 @@ class MyForm(QtGui.QWidget, Ui_Form):
     self.ui.dispPhoto.canvas.fig.canvas.mpl_connect('button_press_event',self.mouseClick)
     
     self.ui.disp_chart.canvas.fig.canvas.mpl_connect('pick_event', self.onpick)
+    self.ui.disp_chart.canvas.fig.canvas.mpl_connect('button_press_event', self.add_or_remove_point)
 
     self.ui.listWidget_13.clicked.connect(self.displayScheduler)
     self.ui.dispSched.canvas.fig.canvas.mpl_connect('button_press_event',self.mouseClick)
@@ -1072,6 +1069,45 @@ class MyForm(QtGui.QWidget, Ui_Form):
     ydata = thisline.get_ydata()
     ind = event.ind
     self.ui.label_9.setText("x=" + str(format(xdata[ind][0], '.3f')) + " y=" + str(format(ydata[ind][0], '.3f')))
+    
+    # Chart point picker
+  def add_or_remove_point(self, event):
+    global agr
+    xydata_a = np.stack(agr.get_data(),axis=1)
+    xdata_a = agr.get_xdata()
+    ydata_a = agr.get_ydata()
+    global bgr
+    xydata_b = bgr.get_offsets()
+    xdata_b = bgr.get_offsets()[:,0]
+    ydata_b = bgr.get_offsets()[:,1]
+        
+        #click x-value
+    xdata_click = event.xdata
+    #index of nearest x-value in a
+    xdata_nearest_index_a = (np.abs(xdata_a-xdata_click)).argmin()
+    #new scatter point x-value
+    new_xdata_point_b = xdata_a[xdata_nearest_index_a]
+    #new scatter point [x-value, y-value]
+    new_xydata_point_b = xydata_a[new_xdata_point_b,:]
+    
+    if event.button == 1:
+        if new_xdata_point_b not in xdata_b:
+                
+            #insert new scatter point into b
+            new_xydata_b = np.insert(xydata_b,0,new_xydata_point_b,axis=0)
+            #sort b based on x-axis values
+            new_xydata_b = new_xydata_b[np.argsort(new_xydata_b[:,0])]
+            #update b
+            b.set_offsets(new_xydata_b)
+            plt.draw()
+    elif event.button == 3:
+        if new_xdata_point_b in xdata_b:
+            #remove xdata point b
+            new_xydata_b = np.delete(xydata_b,np.where(xdata_b==new_xdata_point_b),axis=0)
+            print(new_xdata_point_b)
+            #update b
+            b.set_offsets(new_xydata_b)
+        plt.draw()
 
   #Chart area clear
   def chartClear(self):
@@ -1134,11 +1170,32 @@ class MyForm(QtGui.QWidget, Ui_Form):
             self.ui.comboBox_11.addItem(str(i))
             self.ui.comboBox_12.addItem(str(i))
             self.ui.comboBox_13.addItem(str(i))
+        self.ui.comboBox_12.setCurrentIndex(1)
+        self.ui.comboBox_13.setCurrentIndex(2)
         self.ui.comboBox_14.clear()
         #getting apertures
         apertures = apertures.replace("\n","")
         for aperture in apertures.split(","):
             self.ui.comboBox_14.addItem(aperture.replace("\n", ""))
+            
+
+        head, tail = os.path.split(filename)
+        star_name = tail.replace(".my", "")
+        star = ""
+        t0 = ""
+        period = ""
+        with open("%s/binary_cat.my" %(self.HOME), "r") as ins:
+            for line in ins:
+                if star_name in line:
+                    line = line.replace("\n", "")
+                    star, t0, period = line.split(",")
+                    
+        print(star, t0, period)
+                    
+        if (star != "" and t0 != "" and period != ""):
+            self.ui.lineEdit_19.setText(t0)
+            self.ui.lineEdit_20.setText(period)            
+
         """except:
             QtGui.QMessageBox.critical( self,  ("MYRaf Error"), ("Error reading MYRaf <b>result file</b>!"))
             gui.logging(self, "--- %s - Error reading MYRaf result file!" %(datetime.datetime.utcnow()))    """
@@ -1148,11 +1205,28 @@ class MyForm(QtGui.QWidget, Ui_Form):
     # reading form
     if self.ui.label_43.text():
         #Checking result file
-        if self.ui.label_55.text() and self.ui.comboBox_11.currentText() and self.ui.comboBox_12.currentText() and self.ui.comboBox_13.currentText() and self.ui.comboBox_14.currentText():
+        if self.ui.comboBox_11.currentText() and self.ui.comboBox_12.currentText() and self.ui.comboBox_13.currentText() and self.ui.comboBox_14.currentText():
             varStarID = self.ui.comboBox_11.currentText()
             compStarID = self.ui.comboBox_12.currentText()
             checkStarID = self.ui.comboBox_13.currentText()
             ifilter = self.ui.comboBox_filter.currentText()
+            
+            if self.ui.label_55.text():
+                pointColor = self.ui.label_55.text()
+            else:
+                pointColor = "black"
+                
+            print(ifilter)
+            
+            if str(ifilter) == "B":
+                pointColor = "blue"
+            elif str(ifilter) == "V":
+                pointColor = "green"
+            elif str(ifilter) == "R":
+                pointColor = "red"
+            elif str(ifilter) == "I":
+                pointColor = "brown"
+            
             apertureIndex = self.ui.comboBox_14.currentIndex() + 3
 
             # reading result file
@@ -1174,13 +1248,29 @@ class MyForm(QtGui.QWidget, Ui_Form):
             variable_star['checkDiffMag'] = comp_star[mag_column].astype(float) - check_star[mag_column].astype(float)
             variable_star['checkDiffMag_err'] = np.sqrt(np.power(comp_star[mag_err_column].astype(float), 2) + np.power(
                 check_star[mag_err_column].astype(float), 2))
-
+            
+            head, tail = os.path.split(filename)
+            star_name = tail.replace(".my", "")
 
             if self.ui.checkBox_t0_p.checkState() != QtCore.Qt.Checked:
-                x_axis = "Phase"
+                x_axis = "phase"
                 if self.ui.lineEdit_19.text() and self.ui.lineEdit_20.text():
                     t0 = float(self.ui.lineEdit_19.text())
                     period = float(self.ui.lineEdit_20.text())
+                    print(self.HOME)
+                    s = ""
+                    t = ""
+                    p = ""
+                    with open("%s/binary_cat.my" %(self.HOME), "r") as ins:
+                        with open("%s/binary_cat.my" %(self.HOME), "a") as w:
+                            for line in ins:
+                                if star_name in line:
+                                    line = line.replace("\n", "")
+                                    s, t, p = line.split(",")
+                        
+                            if (s == "" and t == "" and p == ""):
+                                w.write("%s,%s,%s\n" %(star_name, t0, period))
+                    
                 else:
                     print("T0 and Period is not found! Setting T0=0 and P=1...")
                     self.ui.lineEdit_19.setText("0")
@@ -1194,17 +1284,22 @@ class MyForm(QtGui.QWidget, Ui_Form):
                 x_axis = "TIME"
 
             #Plot
-            pointColor = self.ui.label_55.text()
-            sp = str(self.ui.comboBox_15.currentText()).split(" ")[0]
-            gui.PlotFunc(self, self.ui.disp_chart.canvas, variable_star[x_axis],
-                         (variable_star['diffMag']*(-1)),
-                         variable_star['checkDiffMag'],
-                         variable_star['diffMag_err'],
-                         variable_star['checkDiffMag_err'],
-                         pointColor,
-                         "{0} - Ap. ({1})".format(ifilter, self.ui.comboBox_14.currentText()),
-                         sp)
-            head, tail = os.path.split(filename)
+            shape = str(self.ui.comboBox_15.currentText()).split(" ")[0]
+                         
+            phase = variable_star[x_axis]
+            diffMag = variable_star['diffMag']*(-1)
+            checkDiffMag = variable_star['checkDiffMag']
+            diffMag_err = variable_star['diffMag_err']
+            checkDiffMag_err = variable_star['checkDiffMag_err']
+            legend = "{0} - Ap. ({1})".format(ifilter, self.ui.comboBox_14.currentText())
+            # legend = ""
+            
+            self.ui.disp_chart.canvas.axlc1.hold(True)
+            self.ui.disp_chart.canvas.axlc2.hold(True)
+            agr = self.ui.disp_chart.canvas.axlc1.errorbar(phase, diffMag, yerr=diffMag_err,fmt=shape, ecolor="#c3c3c3", color=pointColor, capsize=2, label = "%s" %(legend), picker=5)
+            bgr = self.ui.disp_chart.canvas.axlc2.errorbar(phase, checkDiffMag, yerr=checkDiffMag_err, fmt=shape, ecolor="#c3c3c3", color=pointColor, capsize=2, picker=5)
+            self.ui.disp_chart.canvas.axlc1.legend(shadow = True, loc = (1, 0.5), numpoints = 1,  prop={'size':10})
+            
             self.ui.disp_chart.canvas.axlc1.title.set_fontsize(10)
             self.ui.disp_chart.canvas.axlc1.set_title(tail.replace(".my", " Light Curve"))
             if x_axis == "TIME":
@@ -1244,7 +1339,7 @@ class MyForm(QtGui.QWidget, Ui_Form):
                 variable_star['diffMag_err'].format = '.3f'
                 variable_star['checkDiffMag'].format = '.3f'
                 variable_star['checkDiffMag_err'].format = '.3f'
-
+                
                 ascii.write(variable_star["id",
                                           "TIME",
                                           "phase",
@@ -1534,7 +1629,7 @@ class MyForm(QtGui.QWidget, Ui_Form):
                 circAperture.center = x, y
                 circAnnulus.center = x, y
                 circDannulus.center = x, y
-                self.ui.dispPhoto.canvas.fig.gca().annotate(lNumber, xy = (x, y), xytext=(int(Aperture/3),int(Aperture/3)), textcoords='offset points', color = "blue", fontsize = 10)
+                self.ui.dispPhoto.canvas.fig.gca().annotate(lNumber, xy = (x, y), xytext=(float(Aperture/3),float(Aperture/3)), textcoords='offset points', color = "blue", fontsize = 10)
             self.ui.dispPhoto.canvas.draw()
     #hela vela vel vela
     elif self.ui.tabWidget.currentIndex() == 5:
@@ -2419,12 +2514,12 @@ class MyForm(QtGui.QWidget, Ui_Form):
     f.write("sFluxradi:%s\n" %int(self.ui.doubleSpinBox_4.value()))
     f.write("gain:%s\n" %self.ui.lineEdit_26.text())
     
-    vv = ""
+    vv = []
     for i in xrange(self.ui.listWidget_20.count()):
         val = self.ui.listWidget_20.item(i)
         val = str(val.text())
-        vv = "%s,%s" %(val, vv)
-    f.write("extraVal:%s\n" %(vv[:-1]))
+        vv.append(val)
+    f.write("extraVal:%s\n" %(",".join(vv)))
     f.close()
 #########################################################
 #Unlock calibration tabs.################################

@@ -14,7 +14,6 @@ except:
 from astropy.table import Table
 from astropy import table
 
-
 def readResultFile(self, filename, starID, ifilter, apIndex):
     try:
         result_file = Table.read(filename,

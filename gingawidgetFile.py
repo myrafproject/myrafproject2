@@ -10,8 +10,16 @@
 # This is open-source software licensed under a GPLv3 license.
 
 from PyQt4 import QtGui
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
+
+from matplotlib.backends.qt_compat import QtCore, QtWidgets, is_pyqt5
+if is_pyqt5():
+    from matplotlib.backends.backend_qt5agg import (
+        FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+else:
+    from matplotlib.backends.backend_qt4agg import (
+        FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
+from matplotlib.figure import Figure
 
  
 class MplCanvas(FigureCanvas):

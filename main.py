@@ -1214,18 +1214,18 @@ class MyForm(QtGui.QWidget, Ui_Form):
             if self.ui.label_55.text():
                 pointColor = self.ui.label_55.text()
             else:
-                pointColor = "black"
+                if str(ifilter) == "B":
+                    pointColor = "blue"
+                elif str(ifilter) == "V":
+                    pointColor = "green"
+                elif str(ifilter) == "R":
+                    pointColor = "red"
+                elif str(ifilter) == "I":
+                    pointColor = "brown"
+                elif str(ifilter) == "U":
+                    pointColor = "black"
                 
             print(ifilter)
-            
-            if str(ifilter) == "B":
-                pointColor = "blue"
-            elif str(ifilter) == "V":
-                pointColor = "green"
-            elif str(ifilter) == "R":
-                pointColor = "red"
-            elif str(ifilter) == "I":
-                pointColor = "brown"
             
             apertureIndex = self.ui.comboBox_14.currentIndex() + 3
 

@@ -6,7 +6,7 @@ Created:------------------------------------------------------------------------
             Yücel KILIÇ             Developer
         at:
             Begin                   04.12.2013
-            Last update             17.02.2017
+            Last update             24.05.2020
 Importing things:-----------------------------------------------------------------------------------
         Must have as installed:
             python-2.7
@@ -24,65 +24,47 @@ Importing things:---------------------------------------------------------------
 """
 import sys, time, string, math, signal, datetime, ntpath, numpy, subprocess
 
-try:
-    # force Qt4 API v2
-    import sip
-    apis = ["QDate",
-            "QDateTime",
-            "QString",
-            "QTextStream",
-            "QTime",
-            "QUrl",
-            "QVariant"]
+# force Qt4 API v2
+import sip
+apis = ["QDate",
+        "QDateTime",
+        "QString",
+        "QTextStream",
+        "QTime",
+        "QUrl",
+        "QVariant"]
 
-    for api in apis:
-        sip.setapi(api, 2)
+for api in apis:
+    sip.setapi(api, 2)
     
-    import os
-    os.environ['QT_API'] = 'pyqt4'
-    # force matplotlib to use Qt4 backend
-    import matplotlib
-    matplotlib.use('Qt4Agg', force=True)
-    
-    from PyQt4 import QtGui, QtCore
-    from PyQt4.QtGui import *
-    from PyQt4.QtCore import *
-except:
-    print("Can not load PyQT4")
-    os.system("echo \"- " + str(datetime.datetime.utcnow()) + " - Did you install PyQT4?.\" >>$HOME/.MYRaf2/log.my")
-    raise SystemExit
+import os
+os.environ['QT_API'] = 'pyqt4'
+# force matplotlib to use Qt4 backend
+import matplotlib
+matplotlib.use('Qt4Agg', force=True)
+
+from PyQt4 import QtGui, QtCore
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
+
 
 from matplotlib.patches import Circle
 os.system("mkdir -p $HOME/.MYRaf2")
 os.system("echo \"- " + str(datetime.datetime.utcnow()) + " - MYRaf started.\" >>$HOME/.MYRaf2/log.my")
 
-try:
-    from myraf import Ui_Form
-    from mainErr import MyForm2
-    import function, gui
-except:
-    print("Can not load MYRaf.")
-    os.system("echo \"-- " + str(datetime.datetime.utcnow()) + " - MYRaf is not installed properly.\">>$HOME/.MYRaf2/log.my")
-    raise SystemExit
+from myraf import Ui_Form
+from mainErr import MyForm2
+import function, gui
 
-try:
-    from fPlot import *
-    from sexCat import *
-except:
-    print("Where is fPlot?")
-    raise SystemExit
+from fPlot import *
+from sexCat import *
 
-try:
-    from pyraf import iraf
-    from pyraf.iraf import noao, imred, ccdred, darkcombine, flatcombine, ccdproc ,astutil, setjd, setairmass, asthedit, digiphot, apphot, phot, ptools, txdump, artdata, imgeom
-    from astropy.stats import sigma_clip
-    from numpy import mean
-    import numpy as np
-except:
-    print("Can not load PyRAF, iraf")
-    os.system("echo \"-- " + str(datetime.datetime.utcnow()) + " - Did you install PyRAF, iraf?\">>$HOME/.MYRaf2/log.my")
-    raise SystemExit
 
+from pyraf import iraf
+from pyraf.iraf import noao, imred, ccdred, darkcombine, flatcombine, ccdproc ,astutil, setjd, setairmass, asthedit, digiphot, apphot, phot, ptools, txdump, artdata, imgeom
+from astropy.stats import sigma_clip
+from numpy import mean
+import numpy as np
 
 import alipy
 import glob
